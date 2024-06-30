@@ -5,6 +5,11 @@ body {
     color: #fff;
 }
 
+.Logo {
+    max-width: 50px;
+    cursor: pointer;
+}
+
 .background {
     position: fixed;
     top: 0;
@@ -28,15 +33,19 @@ body {
     display: flex;
     gap: 20px;
     margin-bottom: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
 }
 
 .anime-details img {
     width: 200px;
     border-radius: 10px;
+    max-width: 100%;
 }
 
 .anime-info {
     max-width: 600px;
+    text-align: center;
 }
 
 .anime-info h1 {
@@ -75,6 +84,7 @@ button#watch-now-btn:hover {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+    justify-content: center;
 }
 
 .episode-card {
@@ -88,4 +98,49 @@ button#watch-now-btn:hover {
 
 .episode-card:hover {
     background-color: #444;
+}
+
+@media (max-width: 768px) {
+    .anime-info h1 {
+        font-size: 1.5em;
+    }
+
+    .anime-info p {
+        font-size: 0.9em;
+    }
+
+    button#watch-now-btn {
+        padding: 8px 16px;
+    }
+
+    .episodes-list h2 {
+        font-size: 1.2em;
+    }
+}
+
+@media (max-width: 480px) {
+    .anime-details img {
+        width: 150px;
+    }
+
+    .anime-info h1 {
+        font-size: 1.2em;
+    }
+
+    .anime-info p {
+        font-size: 0.8em;
+    }
+
+    button#watch-now-btn {
+        padding: 6px 12px;
+    }
+
+    .episodes-list h2 {
+        font-size: 1em;
+    }
+
+    .episode-card {
+        width: 50px;
+        padding: 8px;
+    }
 }

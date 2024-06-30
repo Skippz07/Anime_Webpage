@@ -1,4 +1,4 @@
-const apiBaseURL = 'https://animetize-api.vercel.app'; //temp API 
+const apiBaseURL = 'https://animetize-api-wgiz.onrender.com';
 
 async function fetchAnimeInfo(animeId) {
     try {
