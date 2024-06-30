@@ -76,7 +76,7 @@ async function searchAnime(query) {
         return;
     }
     try {
-        const data = await fetchRoute(`${query}`, { page: 1 });
+        const data = await fetchRoute('search', { query, page: 1 });
         displayAnimeList(data.results, 'latest-episodes');
         document.getElementById('current-genre').textContent = `Search Results for: ${query}`;
     } catch (error) {
