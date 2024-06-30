@@ -33,7 +33,7 @@ function displayAnimeInfo(anime) {
 }
 
 function watchEpisode(url, animeId) {
-    window.location.href = `watching.html?episodeUrl=${encodeURIComponent(url)}&id=${encodeURIComponent(animeId)}`;
+    window.location.href = `Watching.html?episodeUrl=${encodeURIComponent(url)}&id=${encodeURIComponent(animeId)}`;
 }
 
 document.getElementById('watch-now-btn').addEventListener('click', () => {

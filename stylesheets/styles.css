@@ -32,7 +32,7 @@ body {
 
 .main-container {
     display: flex;
-    flex-wrap: wrap;
+    width: auto;
 }
 
 .sidebar {
@@ -40,9 +40,6 @@ body {
     width: 200px;
     height: 100vh;
     overflow-y: auto;
-    position: fixed;
-    left: 0;
-    top: 0;
     padding: 10px;
 }
 
@@ -73,9 +70,8 @@ body {
 }
 
 .content {
-    margin-left: 220px;
-    padding: 20px;
     flex-grow: 1;
+    padding: 20px;
 }
 
 .search-bar {
@@ -222,7 +218,7 @@ body {
     }
 
     .anime-card {
-        width:80%;
+        width: 80%;
     }
 
     .anime-card img {

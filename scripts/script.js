@@ -128,8 +128,9 @@ function closeSidebar() {
 }
 
 function redirectToAnime(animeId) {
-    window.location.href = `anime.html?id=${animeId}`;
+    window.location.href = `Anime.html?id=${animeId}`;
 }
+
 
 function resetContent() {
     document.getElementById('current-genre').textContent = 'Now Showing: All Anime';
