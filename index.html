@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HomePage</title>
     <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="manifest" href="manifest.json">
     <script src="https://kit.fontawesome.com/7183df4a39.js" crossorigin="anonymous"></script>
 </head>
 <body>
@@ -41,5 +42,38 @@
         </div>
     </div>
     <script src="scripts/script.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(error) {
+                    console.log('ServiceWorker registration failed: ', error);
+                });
+            });
+        }
+
+        let deferredPrompt;
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            const installButton = document.getElementById('install-button');
+            installButton.style.display = 'block';
+            installButton.addEventListener('click', (e) => {
+                installButton.style.display = 'none';
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the install prompt');
+                    } else {
+                        console.log('User dismissed the install prompt');
+                    }
+                    deferredPrompt = null;
+                });
+            });
+        });
+        const installButtonHTML = `<button id="install-button" style="display: none;">Install App</button>`;
+        document.body.insertAdjacentHTML('beforeend', installButtonHTML);
+    </script>
 </body>
 </html>
