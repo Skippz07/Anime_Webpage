@@ -1,5 +1,6 @@
 const apiBaseURL = 'https://animetize-api-wgiz.onrender.com';
 
+// Fetch anime info and display episodes
 async function fetchAnimeInfo(animeId) {
     try {
         console.log(`Fetching anime info for ID: ${animeId}`);
@@ -9,13 +10,14 @@ async function fetchAnimeInfo(animeId) {
         }
         const data = await response.json();
         console.log('Anime info fetched:', data);
-        displayEpisodes(data.episodes);
+        displayEpisodes(data.episodes, animeId);
     } catch (error) {
         console.error('Error fetching anime info:', error);
     }
 }
 
-function displayEpisodes(episodes) {
+// Display episodes
+function displayEpisodes(episodes, animeId) {
     const episodesContainer = document.getElementById('episodes-container');
     if (!episodes || episodes.length === 0) {
         console.error('No episodes found');
@@ -24,22 +26,21 @@ function displayEpisodes(episodes) {
     }
     console.log('Displaying episodes:', episodes);
     episodesContainer.innerHTML = episodes.map(ep => `
-        <div class="episode-card" onclick="watchEpisode('${ep.url}')">
+        <div class="episode-card" onclick="watchEpisode('${ep.url}', ${ep.number}, '${animeId}')">
             Ep ${ep.number}
         </div>
     `).join('');
-    if (episodes.length > 0) {
-        watchEpisode(episodes[0].url);
-    }
 }
 
-async function watchEpisode(url) {
+// Watch episode
+async function watchEpisode(url, episodeNumber, animeId) {
     console.log(`Watching episode: ${url}`);
     const episodeId = url.split('/').pop(); // Extract episodeId from URL
-    await setVideoSource(episodeId);
+    await setVideoSource(episodeId, episodeNumber, animeId);
 }
 
-async function setVideoSource(episodeId) {
+// Set video source and handle playback
+async function setVideoSource(episodeId, episodeNumber, animeId) {
     const player = document.getElementById('videoPlayer');
     console.log(`Fetching video source for episode ID: ${episodeId}`);
 
@@ -55,23 +56,35 @@ async function setVideoSource(episodeId) {
             throw new Error('No valid video source found');
         }
 
-        console.log(`Setting video source to: ${sources[0].url}`);
-        createQualityButtons(sources);
+        // Find the highest quality source (assuming 1080p is the highest)
+        const highestQualitySource = sources.reduce((prev, current) => {
+            const prevQuality = parseInt(prev.quality.replace('p', '')) || 0;
+            const currentQuality = parseInt(current.quality.replace('p', '')) || 0;
+            return currentQuality > prevQuality ? current : prev;
+        }, sources[0]);
 
-        // Load the default quality
-        setPlayerSource(sources[0].url, player);
+        console.log(`Setting video source to: ${highestQualitySource.url}`);
+        createQualityButtons(sources, episodeNumber, animeId);
+
+        // Load the highest quality source
+        setPlayerSource(highestQualitySource.url, player, episodeId, episodeNumber, animeId);
     } catch (error) {
         console.error('Error setting video source:', error);
     }
 }
 
-function setPlayerSource(url, player) {
+// Set player source and handle playback events
+function setPlayerSource(url, player, episodeId, episodeNumber, animeId) {
     if (Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(url);
         hls.attachMedia(player);
         hls.on(Hls.Events.MANIFEST_PARSED, function() {
             console.log('HLS manifest parsed, playing video');
+            const progress = getWatchProgress(animeId, episodeNumber);
+            if (progress) {
+                player.currentTime = progress.time;
+            }
             player.play();
         });
         hls.on(Hls.Events.ERROR, function(event, data) {
@@ -81,12 +94,20 @@ function setPlayerSource(url, player) {
         player.src = url;
         player.addEventListener('loadedmetadata', function() {
             console.log('Metadata loaded, playing video');
+            const progress = getWatchProgress(animeId, episodeNumber);
+            if (progress) {
+                player.currentTime = progress.time;
+            }
             player.play();
         });
     } else {
         player.src = url;
         player.addEventListener('loadedmetadata', function() {
             console.log('Metadata loaded, playing video');
+            const progress = getWatchProgress(animeId, episodeNumber);
+            if (progress) {
+                player.currentTime = progress.time;
+            }
             player.play();
         });
     }
@@ -94,18 +115,63 @@ function setPlayerSource(url, player) {
     player.onerror = function() {
         console.error('Error playing video');
     };
+
+    // Save progress on pause
+    player.addEventListener('pause', () => {
+        saveWatchProgress(animeId, episodeNumber, player.currentTime);
+        showPopupMessage(`Progress saved at ${formatTime(player.currentTime)}`);
+    });
 }
 
-function createQualityButtons(sources) {
+// Create quality buttons
+function createQualityButtons(sources, episodeNumber, animeId) {
     const container = document.getElementById('videoOptions');
     container.innerHTML = ''; // Clear previous buttons
 
     sources.forEach(source => {
         const button = document.createElement('button');
         button.textContent = source.quality;
-        button.onclick = () => setPlayerSource(source.url, document.getElementById('videoPlayer'));
+        button.onclick = () => setPlayerSource(source.url, document.getElementById('videoPlayer'), source.episodeId, episodeNumber, animeId);
         container.appendChild(button);
     });
+}
+
+// Show popup message
+function showPopupMessage(message) {
+    const popup = document.getElementById('popup-message');
+    popup.textContent = message;
+    popup.style.display = 'block';
+    setTimeout(() => {
+        popup.classList.add('show');
+        setTimeout(() => {
+            popup.classList.remove('show');
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 500);
+        }, 2000);
+    }, 10);
+}
+
+// Format time for display
+function formatTime(seconds) {
+    const minutes = Math.floor(seconds / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${minutes}:${sec < 10 ? '0' : ''}${sec}`;
+}
+
+// Save watch progress
+function saveWatchProgress(animeId, episode, time) {
+    const watchProgress = {
+        episode,
+        time
+    };
+    localStorage.setItem(`anime_${animeId}_episode_${episode}_progress`, JSON.stringify(watchProgress));
+}
+
+// Get watch progress
+function getWatchProgress(animeId, episode) {
+    const progress = localStorage.getItem(`anime_${animeId}_episode_${episode}_progress`);
+    return progress ? JSON.parse(progress) : null;
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -115,9 +181,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log(`Page loaded with episodeUrl: ${episodeUrl} and animeId: ${animeId}`);
 
-    if (episodeUrl) {
+    if (episodeUrl && animeId) {
         const episodeId = episodeUrl.split('/').pop();
-        setVideoSource(episodeId);
+        const episodeNumber = 1; // Default to 1, should be replaced with actual episode number
+        setVideoSource(episodeId, episodeNumber, animeId);
     }
 
     if (animeId) {

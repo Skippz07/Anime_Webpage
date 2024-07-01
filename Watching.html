@@ -6,13 +6,13 @@
     <title>Anime Video Player</title>
     <link rel="stylesheet" href="stylesheets/Watching.css">
     <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script> 
-
 </head>
 <body>
     <div class="navbar">
         <img src="logo.png" alt="Logo" class="Logo" onclick="window.location.href='index.html'">
         <h1> Anime Viewer</h1>
         <i class="fas fa-history icon" onclick="location.href='history.html';"></i>
+    </div>
     <div class="container">
         <div id="video-section">
             <video id="videoPlayer" controls>
@@ -25,6 +25,7 @@
             <div id="episodes-container"></div>
         </div>
     </div>
+    <div id="popup-message" class="popup-message"></div>
     <script src="scripts/Watching.js"></script>
 </body>
 </html>
