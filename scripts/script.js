@@ -86,7 +86,6 @@ async function searchAnime(query) {
     }
 }
 
-
 function handleSearchInput() {
     const query = document.getElementById('search-input').value;
     if (searchTimeout) {
@@ -100,14 +99,16 @@ function handleSearchInput() {
 function displayAnimeList(animeList, containerId) {
     const container = document.getElementById(containerId);
     container.innerHTML = animeList.map(anime => `
-        <div class="anime-card" onclick="redirectToAnime('${anime.id}')">
+        <div class="anime-card" data-anime-id="${anime.id}" onclick="redirectToAnime('${anime.id}')">
             <img src="${anime.image}" alt="${anime.title}">
             <div class="type">${anime.type || 'TV'}</div>
             <h3>${anime.title}</h3>
             <p>${anime.releaseDate || ''}</p>
             <p>${anime.genres ? anime.genres.join(', ') : ''}</p>
+            <i class="fas fa-bookmark bookmark-icon" onclick="toggleBookmark(event, '${anime.id}')"></i>
         </div>
     `).join('');
+    loadBookmarks();
 }
 
 function displayError(message) {
@@ -134,12 +135,53 @@ function redirectToAnime(animeId) {
     window.location.href = `Anime.html?id=${animeId}`;
 }
 
-
 function resetContent() {
     document.getElementById('current-genre').textContent = 'Now Showing: All Anime';
     displayLatestEpisodes();
     displayTopAiringAnime();
     displayPopularMovies();
+}
+
+function saveWatchProgress(animeId, episode, time) {
+    const watchProgress = {
+        episode,
+        time
+    };
+    localStorage.setItem(`anime_${animeId}_progress`, JSON.stringify(watchProgress));
+}
+
+function getWatchProgress(animeId) {
+    const progress = localStorage.getItem(`anime_${animeId}_progress`);
+    return progress ? JSON.parse(progress) : null;
+}
+
+function toggleBookmark(event, animeId) {
+    event.stopPropagation(); // Prevent triggering the card click event
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+    if (bookmarks.includes(animeId)) {
+        // Remove bookmark
+        const index = bookmarks.indexOf(animeId);
+        bookmarks.splice(index, 1);
+        event.target.classList.remove('bookmarked');
+    } else {
+        // Add bookmark
+        bookmarks.push(animeId);
+        event.target.classList.add('bookmarked');
+    }
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+}
+
+function loadBookmarks() {
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+    document.querySelectorAll('.anime-card').forEach(card => {
+        const animeId = card.getAttribute('data-anime-id');
+        const bookmarkIcon = card.querySelector('.bookmark-icon');
+        if (bookmarks.includes(animeId)) {
+            bookmarkIcon.classList.add('bookmarked');
+        } else {
+            bookmarkIcon.classList.remove('bookmarked');
+        }
+    });
 }
 
 document.addEventListener('DOMContentLoaded', () => {

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>History - Bookmarked Anime</title>
+    <link rel="stylesheet" href="stylesheets/history.css">
+    <script src="https://kit.fontawesome.com/7183df4a39.js" crossorigin="anonymous"></script>
+</head>
+<body>
+    <div class="navbar">
+        <img src="logo.png" alt="Logo" class="Logo" onclick="window.location.href='index.html'">
+        <h1>Anime Viewer</h1>
+        <i class="fas fa-home icon" onclick="location.href='index.html';"></i>
+    </div>
+    <div class="main-container">
+        <div class="content">
+            <h2 class="section-title">Bookmarked Anime</h2>
+            <div id="dataDisplay" style="color: red;"></div> <!-- Added element for error messages -->
+            <div id="bookmarked-anime" class="anime-list"></div>
+        </div>
+    </div>
+    <script src="scripts/history.js"></script>
+</body>
+</html>
