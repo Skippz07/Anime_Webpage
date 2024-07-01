@@ -32,6 +32,7 @@ async function displayBookmarkedAnime() {
         for (const animeId of bookmarks) {
             try {
                 const anime = await fetchRoute(`info/${animeId}`);
+                const isBookmarked = bookmarks.includes(anime.id) ? 'bookmarked' : '';
                 const animeCard = `
                     <div class="anime-card" data-anime-id="${anime.id}" onclick="redirectToAnime('${anime.id}')">
                         <img src="${anime.image}" alt="${anime.title}">
@@ -39,7 +40,7 @@ async function displayBookmarkedAnime() {
                         <h3>${anime.title}</h3>
                         <p>${anime.releaseDate || ''}</p>
                         <p>${anime.genres ? anime.genres.join(', ') : ''}</p>
-                        <i class="fas fa-bookmark bookmark-icon bookmarked" onclick="toggleBookmark(event, '${anime.id}')"></i>
+                        <i class="fas fa-bookmark bookmark-icon ${isBookmarked}" onclick="toggleBookmark(event, '${anime.id}')"></i>
                     </div>
                 `;
                 container.insertAdjacentHTML('beforeend', animeCard);
@@ -52,6 +53,21 @@ async function displayBookmarkedAnime() {
     }
 }
 
+function showPopupMessage(message) {
+    const popup = document.getElementById('popup-message');
+    popup.textContent = message;
+    popup.style.display = 'block';
+    setTimeout(() => {
+        popup.classList.add('show');
+        setTimeout(() => {
+            popup.classList.remove('show');
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 500);
+        }, 2000);
+    }, 10);
+}
+
 function toggleBookmark(event, animeId) {
     event.stopPropagation(); // Prevent triggering the card click event
     const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
@@ -60,10 +76,12 @@ function toggleBookmark(event, animeId) {
         // Remove bookmark
         bookmarks.splice(index, 1);
         event.target.classList.remove('bookmarked');
+        showPopupMessage(`${animeId} has been removed!`);
     } else {
         // Add bookmark
         bookmarks.push(animeId);
         event.target.classList.add('bookmarked');
+        showPopupMessage(`${animeId} has been added!`);
     }
     localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
     displayBookmarkedAnime(); // Refresh the display

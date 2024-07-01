@@ -184,6 +184,46 @@ function loadBookmarks() {
     });
 }
 
+
+function showPopupMessage(message) {
+    const popup = document.getElementById('popup-message');
+    popup.textContent = message;
+    popup.style.display = 'block';
+    setTimeout(() => {
+        popup.classList.add('show');
+        setTimeout(() => {
+            popup.classList.remove('show');
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 500);
+        }, 2000);
+    }, 10);
+}
+
+function toggleBookmark(event, animeId) {
+    event.stopPropagation(); // Prevent triggering the card click event
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+    const index = bookmarks.indexOf(animeId);
+    if (index !== -1) {
+        // Remove bookmark
+        bookmarks.splice(index, 1);
+        event.target.classList.remove('bookmarked');
+        showPopupMessage(`${animeId} has been removed!`);
+    } else {
+        // Add bookmark
+        bookmarks.push(animeId);
+        event.target.classList.add('bookmarked');
+        showPopupMessage(`${animeId} has been added!`);
+    }
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+    displayBookmarkedAnime(); // Refresh the display
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    displayBookmarkedAnime(); // Load bookmarked anime on page load
+});
+
+
 document.addEventListener('DOMContentLoaded', () => {
     resetContent();
     displayGenres();
