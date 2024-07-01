@@ -71,18 +71,21 @@ async function fetchGenreAnime(genreId, genreTitle) {
 }
 
 async function searchAnime(query) {
+    console.log(`Searching for: ${query}`);
     if (!query) {
         resetContent();
         return;
     }
     try {
-        const data = await fetchRoute('search', { query, page: 1 });
+        const data = await fetchRoute(`${query}`, { page: 1 });
+        console.log('Search results:', data);
         displayAnimeList(data.results, 'latest-episodes');
         document.getElementById('current-genre').textContent = `Search Results for: ${query}`;
     } catch (error) {
         displayError(`Error searching anime: ${error.message}`);
     }
 }
+
 
 function handleSearchInput() {
     const query = document.getElementById('search-input').value;
@@ -91,7 +94,7 @@ function handleSearchInput() {
     }
     searchTimeout = setTimeout(() => {
         searchAnime(query);
-    }, 500); 
+    }, 300); // Adjust delay as needed
 }
 
 function displayAnimeList(animeList, containerId) {
