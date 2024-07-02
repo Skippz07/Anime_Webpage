@@ -2,54 +2,39 @@ const apiBaseURL = 'https://animetize-api-wgiz.onrender.com';
 
 let searchTimeout;
 
-async function fetchRoute(route, params = {}) {
-    const query = new URLSearchParams(params).toString();
-    const response = await fetch(`${apiBaseURL}/${route}?${query}`);
-    if (!response.ok) {
-        throw new Error('Network response was not ok');
-    }
-    const data = await response.json();
-    console.log(data); // Log API response for debugging
-    return data;
-}
+let genreIds = {
+    action: null,
+    adventure: null,
+    comedy: null,
+    drama: null,
+    sports: null,
+    isekai: null,
+    thriller: null,
+    sliceOfLife: null
+};
 
-async function displayLatestEpisodes() {
+async function fetchGenres() {
     try {
-        const data = await fetchRoute('recent-episodes', { page: 1, type: 1 });
-        displayAnimeList(data.results, 'latest-episodes');
-    } catch (error) {
-        displayError(`Error fetching latest episodes: ${error.message}`);
-    }
-}
+        const response = await fetch(`${apiBaseURL}/genre/list`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log('Fetched genres:', data); // Log the full response for debugging
 
-async function displayTopAiringAnime() {
-    try {
-        const data = await fetchRoute('top-airing', { page: 1 });
-        displayAnimeList(data.results, 'top-airing-anime');
-    } catch (error) {
-        displayError(`Error fetching top airing anime: ${error.message}`);
-    }
-}
-
-async function displayPopularMovies() {
-    try {
-        const data = await fetchRoute('movies', { page: 1 });
-        displayAnimeList(data.results, 'popular-movies');
-    } catch (error) {
-        displayError(`Error fetching popular movies: ${error.message}`);
-    }
-}
-
-async function displayGenres() {
-    try {
-        const data = await fetchRoute('genre/list');
-        const container = document.getElementById('genre-list');
-        if (data && data.length > 0) {
-            container.innerHTML = data.map(genre => `
-                <div class="genre-card" onclick="fetchGenreAnime('${genre.id}', '${genre.title}')">
-                    ${genre.title}
-                </div>
-            `).join('');
+        if (Array.isArray(data)) {
+            data.forEach(genre => {
+                const title = genre.title.toLowerCase();
+                if (title === 'action') genreIds.action = genre.id;
+                if (title === 'adventure') genreIds.adventure = genre.id;
+                if (title === 'comedy') genreIds.comedy = genre.id;
+                if (title === 'drama') genreIds.drama = genre.id;
+                if (title === 'sports') genreIds.sports = genre.id;
+                if (title === 'isekai') genreIds.isekai = genre.id;
+                if (title === 'thriller') genreIds.thriller = genre.id;
+                if (title === 'slice of life') genreIds.sliceOfLife = genre.id;
+            });
+            console.log('Genre IDs:', genreIds);
         } else {
             console.error('Invalid genres data:', data);
             displayError('Failed to load genres.');
@@ -59,14 +44,59 @@ async function displayGenres() {
     }
 }
 
-async function fetchGenreAnime(genreId, genreTitle) {
+async function fetchRoute(route, params = {}, pageLimit = 3) {
+    let results = [];
+    for (let page = 1; page <= pageLimit; page++) {
+        const query = new URLSearchParams({ ...params, page }).toString();
+        const response = await fetch(`${apiBaseURL}/${route}?${query}`);
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        console.log(data); // Log API response for debugging
+        results = results.concat(data.results);
+    }
+    return results;
+}
+
+async function displayLatestEpisodes() {
     try {
-        const data = await fetchRoute(`genre/${genreId}`);
-        displayAnimeList(data.results, 'latest-episodes');
-        document.getElementById('current-genre').textContent = `Now Showing: ${genreTitle} Anime`;
-        highlightSelectedGenre(genreId);
+        const results = await fetchRoute('recent-episodes', { type: 1 }, 3);
+        displayAnimeList(results, 'latest-episodes');
     } catch (error) {
-        displayError(`Error fetching anime for genre: ${error.message}`);
+        displayError(`Error fetching latest episodes: ${error.message}`);
+    }
+}
+
+async function displayTopAiringAnime() {
+    try {
+        const results = await fetchRoute('top-airing', {}, 3);
+        displayAnimeList(results, 'top-airing-anime');
+    } catch (error) {
+        displayError(`Error fetching top airing anime: ${error.message}`);
+    }
+}
+
+async function displayPopularMovies() {
+    try {
+        const results = await fetchRoute('movies', {}, 3);
+        displayAnimeList(results, 'popular-movies');
+    } catch (error) {
+        displayError(`Error fetching popular movies: ${error.message}`);
+    }
+}
+
+async function displayGenreAnime(genreId, containerId) {
+    if (!genreId) {
+        await fetchGenres();
+    }
+    if (genreId) {
+        try {
+            const results = await fetchRoute(`genre/${genreId}`, {}, 3);
+            displayAnimeList(results, containerId);
+        } catch (error) {
+            displayError(`Error fetching anime: ${error.message}`);
+        }
     }
 }
 
@@ -101,7 +131,6 @@ function displayAnimeList(animeList, containerId) {
     container.innerHTML = animeList.map(anime => `
         <div class="anime-card" data-anime-id="${anime.id}" onclick="redirectToAnime('${anime.id}')">
             <img src="${anime.image}" alt="${anime.title}">
-            <div class="type">${anime.type || 'TV'}</div>
             <h3>${anime.title}</h3>
             <p>${anime.releaseDate || ''}</p>
             <p>${anime.genres ? anime.genres.join(', ') : ''}</p>
@@ -114,17 +143,7 @@ function displayAnimeList(animeList, containerId) {
 function displayError(message) {
     const display = document.getElementById('dataDisplay');
     display.textContent = message;
-    display.style.color = 'red';
-}
-
-function highlightSelectedGenre(genreId) {
-    const genreCards = document.querySelectorAll('.genre-card');
-    genreCards.forEach(card => {
-        card.classList.remove('selected');
-        if (card.onclick.toString().includes(genreId)) {
-            card.classList.add('selected');
-        }
-    });
+    display.style.display = 'block'; // Show the error message
 }
 
 function closeSidebar() {
@@ -140,6 +159,14 @@ function resetContent() {
     displayLatestEpisodes();
     displayTopAiringAnime();
     displayPopularMovies();
+    displayGenreAnime(genreIds.action, 'action-anime');
+    displayGenreAnime(genreIds.adventure, 'adventure-anime');
+    displayGenreAnime(genreIds.comedy, 'comedy-anime');
+    displayGenreAnime(genreIds.drama, 'drama-anime');
+    displayGenreAnime(genreIds.sports, 'sports-anime');
+    displayGenreAnime(genreIds.isekai, 'isekai-anime');
+    displayGenreAnime(genreIds.thriller, 'thriller-anime');
+    displayGenreAnime(genreIds.sliceOfLife, 'sliceoflife-anime');
 }
 
 function saveWatchProgress(animeId, episode, time) {
@@ -153,51 +180,6 @@ function saveWatchProgress(animeId, episode, time) {
 function getWatchProgress(animeId) {
     const progress = localStorage.getItem(`anime_${animeId}_progress`);
     return progress ? JSON.parse(progress) : null;
-}
-
-function toggleBookmark(event, animeId) {
-    event.stopPropagation(); // Prevent triggering the card click event
-    const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
-    if (bookmarks.includes(animeId)) {
-        // Remove bookmark
-        const index = bookmarks.indexOf(animeId);
-        bookmarks.splice(index, 1);
-        event.target.classList.remove('bookmarked');
-    } else {
-        // Add bookmark
-        bookmarks.push(animeId);
-        event.target.classList.add('bookmarked');
-    }
-    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
-}
-
-function loadBookmarks() {
-    const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
-    document.querySelectorAll('.anime-card').forEach(card => {
-        const animeId = card.getAttribute('data-anime-id');
-        const bookmarkIcon = card.querySelector('.bookmark-icon');
-        if (bookmarks.includes(animeId)) {
-            bookmarkIcon.classList.add('bookmarked');
-        } else {
-            bookmarkIcon.classList.remove('bookmarked');
-        }
-    });
-}
-
-
-function showPopupMessage(message) {
-    const popup = document.getElementById('popup-message');
-    popup.textContent = message;
-    popup.style.display = 'block';
-    setTimeout(() => {
-        popup.classList.add('show');
-        setTimeout(() => {
-            popup.classList.remove('show');
-            setTimeout(() => {
-                popup.style.display = 'none';
-            }, 500);
-        }, 2000);
-    }, 10);
 }
 
 function toggleBookmark(event, animeId) {
@@ -219,12 +201,51 @@ function toggleBookmark(event, animeId) {
     displayBookmarkedAnime(); // Refresh the display
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    displayBookmarkedAnime(); // Load bookmarked anime on page load
-});
+function loadBookmarks() {
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+    document.querySelectorAll('.anime-card').forEach(card => {
+        const animeId = card.getAttribute('data-anime-id');
+        const bookmarkIcon = card.querySelector('.bookmark-icon');
+        if (bookmarks.includes(animeId)) {
+            bookmarkIcon.classList.add('bookmarked');
+        } else {
+            bookmarkIcon.classList.remove('bookmarked');
+        }
+    });
+}
 
+function showPopupMessage(message) {
+    const popup = document.getElementById('popup-message');
+    popup.textContent = message;
+    popup.style.display = 'block';
+    setTimeout(() => {
+        popup.classList.add('show');
+        setTimeout(() => {
+            popup.classList.remove('show');
+            setTimeout(() => {
+                popup.style.display = 'none';
+            }, 500);
+        }, 2000);
+    }, 10);
+}
 
-document.addEventListener('DOMContentLoaded', () => {
+function scrollLeft(containerId) {
+    const container = document.getElementById(containerId);
+    container.scrollBy({
+        left: -300,
+        behavior: 'smooth'
+    });
+}
+
+function scrollRight(containerId) {
+    const container = document.getElementById(containerId);
+    container.scrollBy({
+        left: 300,
+        behavior: 'smooth'
+    });
+}
+
+document.addEventListener('DOMContentLoaded', async () => {
+    await fetchGenres();
     resetContent();
-    displayGenres();
 });

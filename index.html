@@ -15,30 +15,90 @@
         <i class="fas fa-history icon" onclick="location.href='history.html';"></i>
     </div>
     <div class="main-container">
-        <div class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2>Genres</h2>
-                <button onclick="closeSidebar()">Hide</button>
-            </div>
-            <div class="genre-list" id="genre-list"></div>
-        </div>
         <div class="content">
             <div class="search-bar">
                 <input type="text" id="search-input" placeholder="Search for anime..." oninput="handleSearchInput()">
             </div>
             <h2 id="current-genre">Now Showing: All Anime</h2>
+            <div id="dataDisplay" style="display: none; color: red;"></div>
+            
             <div class="section">
                 <h2 class="section-title">Latest Episodes</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('latest-episodes')">&lt;</button>
                 <div id="latest-episodes" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('latest-episodes')">&gt;</button>
             </div>
+
             <div class="section">
                 <h2 class="section-title">Top Airing Anime</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('top-airing-anime')">&lt;</button>
                 <div id="top-airing-anime" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('top-airing-anime')">&gt;</button>
             </div>
+
             <div class="section">
                 <h2 class="section-title">Popular Movies</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('popular-movies')">&lt;</button>
                 <div id="popular-movies" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('popular-movies')">&gt;</button>
             </div>
+
+            <div class="section">
+                <h2 class="section-title">Action Anime</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('action-anime')">&lt;</button>
+                <div id="action-anime" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('action-anime')">&gt;</button>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Adventure Anime</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('adventure-anime')">&lt;</button>
+                <div id="adventure-anime" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('adventure-anime')">&gt;</button>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Comedy Anime</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('comedy-anime')">&lt;</button>
+                <div id="comedy-anime" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('comedy-anime')">&gt;</button>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Drama Anime</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('drama-anime')">&lt;</button>
+                <div id="drama-anime" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('drama-anime')">&gt;</button>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Sports Anime</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('sports-anime')">&lt;</button>
+                <div id="sports-anime" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('sports-anime')">&gt;</button>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Isekai Anime</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('isekai-anime')">&lt;</button>
+                <div id="isekai-anime" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('isekai-anime')">&gt;</button>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Thriller Anime</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('thriller-anime')">&lt;</button>
+                <div id="thriller-anime" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('thriller-anime')">&gt;</button>
+            </div>
+
+            <div class="section">
+                <h2 class="section-title">Slice of Life Anime</h2>
+                <button class="arrow arrow-left" onclick="scrollLeft('sliceoflife-anime')">&lt;</button>
+                <div id="sliceoflife-anime" class="anime-list"></div>
+                <button class="arrow arrow-right" onclick="scrollRight('sliceoflife-anime')">&gt;</button>
+            </div>
+
         </div>
     </div>
     <div id="popup-message" class="popup-message"></div>
