@@ -82,20 +82,20 @@ body {
     background-color: #333;
     border-radius: 10px;
     overflow: hidden;
-    flex: 0 0 calc((100% - 90px) / 10); /* Show 10 cards per row */
+    flex: 0 0 calc((100% - 90px) / 10); 
     text-align: center;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
     transition: all 0.3s ease;
     cursor: pointer;
     position: relative;
     scroll-snap-align: start;
-    min-width: 100px; /* Ensure all cards have the same width */
+    min-width: 100px; 
 }
 
 .anime-card img {
     width: 100%;
-    height: 200px; /* Ensure all cards have the same height */
-    object-fit: cover; /* Ensure images cover the card area */
+    height: 200px; 
+    object-fit: cover;
 }
 
 .anime-card h3 {
@@ -189,11 +189,11 @@ body {
 
 /* Custom scrollbar styles */
 .anime-list::-webkit-scrollbar {
-    height: 8px; /* Adjust the height of the scrollbar */
+    height: 8px; 
 }
 
 .anime-list::-webkit-scrollbar-track {
-    background: #1c1c1c; /* Background of the track */
+    background: #1c1c1c; 
     border-radius: 10px;
 }
 
@@ -205,6 +205,51 @@ body {
 .anime-list::-webkit-scrollbar-thumb:hover {
     background: #888; /* Color of the scrollbar thumb when hovered */
 }
+
+#loading-screen {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    background-color: black;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.tv-container {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.tv-icon {
+    position: relative;
+    font-size: 100px;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loader {
+    position: absolute;
+    width: 30px;
+    height: 30px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 1.5s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 
 @media (max-width: 768px) {
     .navbar h1 {

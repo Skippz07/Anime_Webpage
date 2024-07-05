@@ -244,6 +244,17 @@ function scrollRight(containerId) {
         behavior: 'smooth'
     });
 }
+document.addEventListener('DOMContentLoaded', async () => {
+    setTimeout(async () => {
+        await fetchGenres();
+        resetContent();
+        document.getElementById('search-input').addEventListener('input', handleSearchInput);
+        // Hide the loading screen after content is loaded
+        document.getElementById('loading-screen').style.display = 'none';
+    }, 1000); // Adjust this value for longer/shorter duration
+});
+
+
 
 document.addEventListener('DOMContentLoaded', async () => {
     await fetchGenres();

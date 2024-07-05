@@ -8,9 +8,13 @@ async function fetchAnimeInfo(animeId) {
         }
         const data = await response.json();
         displayAnimeInfo(data);
+        // Hide the loading screen after content is loaded
+        document.getElementById('loading-screen').style.display = 'none';
     } catch (error) {
         console.error('Error fetching anime info:', error);
         document.getElementById('anime-title').textContent = 'Error fetching anime info';
+        // Hide the loading screen even if there is an error
+        document.getElementById('loading-screen').style.display = 'none';
     }
 }
 
@@ -53,5 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
         fetchAnimeInfo(animeId);
     } else {
         document.getElementById('anime-title').textContent = 'No anime selected';
+        document.getElementById('loading-screen').style.display = 'none';
     }
 });

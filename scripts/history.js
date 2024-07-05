@@ -48,8 +48,12 @@ async function displayBookmarkedAnime() {
                 displayError(`Error fetching bookmarked anime: ${error.message}`);
             }
         }
+        // Hide the loading screen after content is loaded
+        document.getElementById('loading-screen').style.display = 'none';
     } else {
         container.innerHTML = '<p>No bookmarked anime.</p>';
+        // Hide the loading screen if no anime is bookmarked
+        document.getElementById('loading-screen').style.display = 'none';
     }
 }
 
@@ -84,7 +88,7 @@ function toggleBookmark(event, animeId) {
         showPopupMessage(`${animeId} has been added!`);
     }
     localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
-    displayBookmarkedAnime(); // Refresh the display
+    displayBookmarkedAnime(); 
 }
 
 document.addEventListener('DOMContentLoaded', () => {
