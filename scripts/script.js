@@ -131,14 +131,15 @@ function displayAnimeList(animeList, containerId) {
     container.innerHTML = animeList.map(anime => `
         <div class="anime-card" data-anime-id="${anime.id}" onclick="redirectToAnime('${anime.id}')">
             <img src="${anime.image}" alt="${anime.title}">
+            <i class="fas fa-bookmark bookmark-icon" onclick="toggleBookmark(event, '${anime.id}')"></i>
             <h3>${anime.title}</h3>
             <p>${anime.releaseDate || ''}</p>
             <p>${anime.genres ? anime.genres.join(', ') : ''}</p>
-            <i class="fas fa-bookmark bookmark-icon" onclick="toggleBookmark(event, '${anime.id}')"></i>
         </div>
     `).join('');
     loadBookmarks();
 }
+
 
 function displayError(message) {
     const display = document.getElementById('dataDisplay');
