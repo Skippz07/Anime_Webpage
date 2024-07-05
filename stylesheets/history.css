@@ -75,13 +75,20 @@ body {
 
 .anime-card h3 {
     margin: 8px 0;
-    font-size: 1em;
+    font-size: 0.6em;
+    white-space: nowrap; 
+    overflow: hidden;    
+    text-overflow: ellipsis; 
 }
 
 .anime-card p {
     margin: 8px;
     font-size: 0.8em;
+    white-space: nowrap; 
+    overflow: hidden;    
+    text-overflow: ellipsis; 
 }
+
 
 .anime-card:hover {
     transform: scale(1.05);

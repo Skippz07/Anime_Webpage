@@ -134,7 +134,6 @@ function displayAnimeList(animeList, containerId) {
             <i class="fas fa-bookmark bookmark-icon" onclick="toggleBookmark(event, '${anime.id}')"></i>
             <h3>${anime.title}</h3>
             <p>${anime.releaseDate || ''}</p>
-            <p>${anime.genres ? anime.genres.join(', ') : ''}</p>
         </div>
     `).join('');
     loadBookmarks();
