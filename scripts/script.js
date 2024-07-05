@@ -44,25 +44,21 @@ async function fetchGenres() {
     }
 }
 
-async function fetchRoute(route, params = {}, pageLimit = 3) {
-    let results = [];
-    for (let page = 1; page <= pageLimit; page++) {
-        const query = new URLSearchParams({ ...params, page }).toString();
-        const response = await fetch(`${apiBaseURL}/${route}?${query}`);
-        if (!response.ok) {
-            throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        console.log(data); // Log API response for debugging
-        results = results.concat(data.results);
+async function fetchRoute(route, params = {}) {
+    const query = new URLSearchParams(params).toString();
+    const response = await fetch(`${apiBaseURL}/${route}?${query}`);
+    if (!response.ok) {
+        throw new Error('Network response was not ok');
     }
-    return results;
+    const data = await response.json();
+    console.log(data); // Log API response for debugging
+    return data;
 }
 
 async function displayLatestEpisodes() {
     try {
-        const results = await fetchRoute('recent-episodes', { type: 1 }, 3);
-        displayAnimeList(results, 'latest-episodes');
+        const data = await fetchRoute('recent-episodes', { page: 1, type: 1 });
+        displayAnimeList(data.results, 'latest-episodes');
     } catch (error) {
         displayError(`Error fetching latest episodes: ${error.message}`);
     }
@@ -70,8 +66,8 @@ async function displayLatestEpisodes() {
 
 async function displayTopAiringAnime() {
     try {
-        const results = await fetchRoute('top-airing', {}, 3);
-        displayAnimeList(results, 'top-airing-anime');
+        const data = await fetchRoute('top-airing', { page: 1 });
+        displayAnimeList(data.results, 'top-airing-anime');
     } catch (error) {
         displayError(`Error fetching top airing anime: ${error.message}`);
     }
@@ -79,8 +75,8 @@ async function displayTopAiringAnime() {
 
 async function displayPopularMovies() {
     try {
-        const results = await fetchRoute('movies', {}, 3);
-        displayAnimeList(results, 'popular-movies');
+        const data = await fetchRoute('movies', { page: 1 });
+        displayAnimeList(data.results, 'popular-movies');
     } catch (error) {
         displayError(`Error fetching popular movies: ${error.message}`);
     }
@@ -92,8 +88,8 @@ async function displayGenreAnime(genreId, containerId) {
     }
     if (genreId) {
         try {
-            const results = await fetchRoute(`genre/${genreId}`, {}, 3);
-            displayAnimeList(results, containerId);
+            const data = await fetchRoute(`genre/${genreId}`, { page: 1 });
+            displayAnimeList(data.results, containerId);
         } catch (error) {
             displayError(`Error fetching anime: ${error.message}`);
         }
@@ -108,9 +104,13 @@ async function searchAnime(query) {
     }
     try {
         const data = await fetchRoute(`${query}`, { page: 1 });
-        console.log('Search results:', data);
-        displayAnimeList(data.results, 'latest-episodes');
-        document.getElementById('current-genre').textContent = `Search Results for: ${query}`;
+        console.log('Search results:', data.results);
+        if (Array.isArray(data.results)) {
+            displayAnimeList(data.results, 'latest-episodes');
+            document.getElementById('current-genre').textContent = `Search Results for: ${query}`;
+        } else {
+            throw new Error('Invalid search results format');
+        }
     } catch (error) {
         displayError(`Error searching anime: ${error.message}`);
     }
@@ -248,4 +248,5 @@ function scrollRight(containerId) {
 document.addEventListener('DOMContentLoaded', async () => {
     await fetchGenres();
     resetContent();
+    document.getElementById('search-input').addEventListener('input', handleSearchInput);
 });

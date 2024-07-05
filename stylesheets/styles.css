@@ -187,6 +187,25 @@ body {
     opacity: 1;
 }
 
+/* Custom scrollbar styles */
+.anime-list::-webkit-scrollbar {
+    height: 8px; /* Adjust the height of the scrollbar */
+}
+
+.anime-list::-webkit-scrollbar-track {
+    background: #1c1c1c; /* Background of the track */
+    border-radius: 10px;
+}
+
+.anime-list::-webkit-scrollbar-thumb {
+    background: #555; /* Color of the scrollbar thumb */
+    border-radius: 10px;
+}
+
+.anime-list::-webkit-scrollbar-thumb:hover {
+    background: #888; /* Color of the scrollbar thumb when hovered */
+}
+
 @media (max-width: 768px) {
     .navbar h1 {
         font-size: 1em;
