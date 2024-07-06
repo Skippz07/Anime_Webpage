@@ -108,14 +108,25 @@ async function searchAnime(query) {
         const data = await fetchRoute(`${query}`, { page: 1 });
         console.log('Search results:', data.results);
         if (Array.isArray(data.results)) {
-            displayAnimeList(data.results, 'latest-episodes');
-            document.getElementById('current-genre').textContent = `Search Results for: ${query}`;
+            displayAnimeList(data.results, 'search-results-list');
+            const searchResultsContainer = document.getElementById('search-results');
+            const searchResultsTitle = document.getElementById('search-results-title');
+            searchResultsTitle.textContent = `Search Results for: ${query}`;
+            searchResultsContainer.style.display = 'block';
+            hideOtherSections(); // Hide other sections when displaying search results
         } else {
             throw new Error('Invalid search results format');
         }
     } catch (error) {
         displayError(`Error searching anime: ${error.message}`);
     }
+}
+
+function hideOtherSections() {
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+        section.style.display = 'none';
+    });
 }
 
 function handleSearchInput() {
@@ -141,7 +152,6 @@ function displayAnimeList(animeList, containerId) {
     loadBookmarks();
 }
 
-
 function displayError(message) {
     const display = document.getElementById('dataDisplay');
     display.textContent = message;
@@ -152,12 +162,16 @@ function closeSidebar() {
     document.getElementById('sidebar').style.display = 'none';
 }
 
-function redirectToAnime(animeId) {
+window.redirectToAnime = function redirectToAnime(animeId) {
     window.location.href = `Anime.html?id=${animeId}`;
 }
 
 function resetContent() {
-    document.getElementById('current-genre').textContent = 'Now Showing: All Anime';
+    document.getElementById('search-results').style.display = 'none';
+    const sections = document.querySelectorAll('.section');
+    sections.forEach(section => {
+        section.style.display = 'block';
+    });
     displayLatestEpisodes();
     displayTopAiringAnime();
     displayPopularMovies();
@@ -171,7 +185,8 @@ function resetContent() {
     displayGenreAnime(genreIds.sliceOfLife, 'sliceoflife-anime');
 }
 
-function saveWatchProgress(animeId, episode, time) {
+
+window.saveWatchProgress = function saveWatchProgress(animeId, episode, time) {
     const watchProgress = {
         episode,
         time
@@ -179,12 +194,12 @@ function saveWatchProgress(animeId, episode, time) {
     localStorage.setItem(`anime_${animeId}_progress`, JSON.stringify(watchProgress));
 }
 
-function getWatchProgress(animeId) {
+window.getWatchProgress = function getWatchProgress(animeId) {
     const progress = localStorage.getItem(`anime_${animeId}_progress`);
     return progress ? JSON.parse(progress) : null;
 }
 
-function toggleBookmark(event, animeId) {
+window.toggleBookmark = function toggleBookmark(event, animeId) {
     event.stopPropagation(); // Prevent triggering the card click event
     const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
     const index = bookmarks.indexOf(animeId);
@@ -231,7 +246,7 @@ function showPopupMessage(message) {
     }, 10);
 }
 
-function scrollLeft(containerId) {
+window.scrollLeft = function scrollLeft(containerId) {
     const container = document.getElementById(containerId);
     container.scrollBy({
         left: -300,
@@ -239,13 +254,14 @@ function scrollLeft(containerId) {
     });
 }
 
-function scrollRight(containerId) {
+window.scrollRight = function scrollRight(containerId) {
     const container = document.getElementById(containerId);
     container.scrollBy({
         left: 300,
         behavior: 'smooth'
     });
 }
+
 document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(async () => {
         await fetchGenres();
@@ -253,13 +269,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('search-input').addEventListener('input', handleSearchInput);
         // Hide the loading screen after content is loaded
         document.getElementById('loading-screen').style.display = 'none';
-    }, 1000); // Adjust this value for longer/shorter duration
-});
-
-
-
-document.addEventListener('DOMContentLoaded', async () => {
-    await fetchGenres();
-    resetContent();
-    document.getElementById('search-input').addEventListener('input', handleSearchInput);
+    }, 4000); // Adjust this value for longer/shorter duration
 });

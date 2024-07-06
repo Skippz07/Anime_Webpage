@@ -27,9 +27,12 @@
             <div class="search-bar">
                 <input type="text" id="search-input" placeholder="Search for anime..." oninput="handleSearchInput()">
             </div>
-            <h2 id="current-genre">Now Showing: All Anime</h2>
-            <div id="dataDisplay" style="display: none; color: red;"></div>
-            
+        <div id="dataDisplay" style="display: none; color: red;"></div>
+
+        <div id="search-results" class="search-results" style="display: none;">
+            <h2 id="search-results-title"></h2>
+            <div id="search-results-list" class="anime-list"></div>
+        </div>
             <div class="section">
                 <h2 class="section-title">Latest Episodes</h2>
                 <button class="arrow arrow-left" onclick="scrollLeft('latest-episodes')">&lt;</button>
