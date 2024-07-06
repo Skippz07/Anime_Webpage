@@ -1,5 +1,6 @@
-const apiBaseURL = 'https://animetize-api-wgiz.onrender.com';
+import CONFIG from '/scripts/config.js';
 
+const apiBaseURL = CONFIG.API_BASE_URL;
 // Fetch anime info and display episodes
 async function fetchAnimeInfo(animeId) {
     try {

@@ -1,5 +1,6 @@
-const apiBaseURL = 'https://animetize-api-wgiz.onrender.com';
+import CONFIG from '/scripts/config.js';
 
+const apiBaseURL = CONFIG.API_BASE_URL;
 async function fetchRoute(route, params = {}) {
     const query = new URLSearchParams(params).toString();
     const response = await fetch(`${apiBaseURL}/${route}?${query}`);
