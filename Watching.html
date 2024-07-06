@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anime Video Player</title>
     <link rel="stylesheet" href="stylesheets/Watching.css">
-    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script> 
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 </head>
 <body>
     <div class="navbar">
@@ -26,6 +26,10 @@
         </div>
     </div>
     <div id="popup-message" class="popup-message"></div>
+
+    <!-- Hidden video element for retrieving durations -->
+    <video id="hiddenVideo" style="display:none;"></video>
+
     <script src="scripts/Watching.js"></script>
 </body>
 </html>

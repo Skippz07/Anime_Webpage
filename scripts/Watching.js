@@ -25,11 +25,20 @@ function displayEpisodes(episodes, animeId) {
         return;
     }
     console.log('Displaying episodes:', episodes);
-    episodesContainer.innerHTML = episodes.map(ep => `
-        <div class="episode-card" onclick="watchEpisode('${ep.url}', ${ep.number}, '${animeId}')">
-            Ep ${ep.number}
-        </div>
-    `).join('');
+
+    episodesContainer.innerHTML = episodes.map(ep => {
+        const progress = getWatchProgress(animeId, ep.number);
+        const progressTime = progress ? formatTime(progress.time) : 'Not started';
+
+        return `
+            <div class="episode-card" onclick="watchEpisode('${ep.url}', ${ep.number}, '${animeId}')">
+                <div class="episode-header">
+                    Ep ${ep.number}
+                    <span class="progress-time">${progressTime}</span>
+                </div>
+            </div>
+        `;
+    }).join('');
 }
 
 // Watch episode
@@ -173,6 +182,8 @@ function getWatchProgress(animeId, episode) {
     const progress = localStorage.getItem(`anime_${animeId}_episode_${episode}_progress`);
     return progress ? JSON.parse(progress) : null;
 }
+
+
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
