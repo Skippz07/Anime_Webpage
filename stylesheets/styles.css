@@ -51,20 +51,37 @@ body {
     margin-bottom: 20px;
 }
 
-.search-bar input {
-    padding: 8px;
-    width: 100%;
+.search-container {
+    position: relative;
+    display: flex;
+    align-items: center;
     max-width: 250px;
+    width: 100%;
+}
+
+.search-container input {
+    padding: 8px;
+    padding-right: 30px; /* Add padding to the right to make space for the icon */
+    width: 100%;
     border: none;
     border-radius: 5px;
     outline: none;
     background-color: #637385; /* Search bar background color */
-    color: #e2e2e2; /* Search bar text color */
+    color: #e2e2e2; 
+}
+
+.search-container input::placeholder {
+    color: #e2e2e2; /* Placeholder text color */
+}
+.search-container .search-icon {
+    position: absolute;
+    right: 10px; 
+    color: #e2e2e2; /* Icon color */
 }
 
 .section {
     margin-bottom: 30px;
-    position: relative; /* Position arrows absolutely within the section */
+    position: relative; 
 }
 
 .section-title {
@@ -73,7 +90,7 @@ body {
     font-weight: bold; 
     font-size: 2em;
     letter-spacing: 1px; 
-    color: #b7cece; /* Section title color */
+    color: #b7cece; 
 }
 
 .anime-list {
@@ -86,7 +103,7 @@ body {
 }
 
 .anime-card {
-    background-color: #637385; /* Card background color */
+    background-color: #637385; 
     border-radius: 10px;
     overflow: hidden;
     flex: 0 0 calc((100% - 90px) / 10); 
@@ -111,7 +128,7 @@ body {
     white-space: nowrap; 
     overflow: hidden;    
     text-overflow: ellipsis; 
-    color: #e2e2e2; /* Card title color */
+    color: #e2e2e2; 
 }
 
 .anime-card p {
@@ -120,7 +137,7 @@ body {
     white-space: nowrap; 
     overflow: hidden;    
     text-overflow: ellipsis; 
-    color: #e2e2e2; /* Card description color */
+    color: #e2e2e2; 
 }
 
 .anime-card:hover {
@@ -235,8 +252,8 @@ body {
 
 .tv-container {
     position: relative;
-    width: 100px;
-    height: 100px;
+    width: 210px;
+    height: 210px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -244,7 +261,7 @@ body {
 
 .tv-icon {
     position: relative;
-    font-size: 100px;
+    font-size: 150px;
     color: #fff;
     display: flex;
     justify-content: center;
@@ -253,12 +270,14 @@ body {
 
 .loader {
     position: absolute;
-    width: 30px;
-    height: 30px;
+    width: 50px;
+    height: 50px;
     border: 4px solid #f3f3f3;
     border-top: 4px solid #3498db;
     border-radius: 50%;
     animation: spin 1.5s linear infinite;
+    margin-bottom: 20px; 
+
 }
 
 @keyframes spin {
@@ -280,6 +299,8 @@ body {
     }
 
     .anime-list {
+
+
         gap: 10px;
     }
 

@@ -20,13 +20,17 @@
     <div class="navbar">
         <img src="logo.png" alt="Logo" class="Logo" onclick="window.location.href='index.html'">
         <h1>Anime Viewer</h1>
-        <i class="fas fa-history icon" onclick="location.href='history.html';"></i>
+        <i class="fas fa-bookmark icon" onclick="location.href='history.html';"></i>
     </div>
     <div class="main-container">
         <div class="content">
             <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Search for anime..." oninput="handleSearchInput()">
+                <div class="search-container">
+                    <input type="text" id="search-input" placeholder="Search for anime...">
+                    <i class="fas fa-search search-icon"></i>
+                </div>
             </div>
+            
         <div id="dataDisplay" style="display: none; color: red;"></div>
 
         <div id="search-results" class="search-results" style="display: none;">

@@ -269,5 +269,5 @@ document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('search-input').addEventListener('input', handleSearchInput);
         // Hide the loading screen after content is loaded
         document.getElementById('loading-screen').style.display = 'none';
-    }, 4000); // Adjust this value for longer/shorter duration
+    }, 3000); // Adjust this value for longer/shorter duration
 });
