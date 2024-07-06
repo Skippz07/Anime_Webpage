@@ -1,4 +1,4 @@
-import CONFIG from '/scripts/config.js';
+import CONFIG from 'scripts/config.js';
 
 const apiBaseURL = CONFIG.API_BASE_URL;
 
