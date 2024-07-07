@@ -1,6 +1,7 @@
 import CONFIG from './config.js';
 
 const apiBaseURL = CONFIG.API_BASE_URL;
+
 // Fetch anime info and display episodes
 async function fetchAnimeInfo(animeId) {
     try {
@@ -43,11 +44,11 @@ function displayEpisodes(episodes, animeId) {
 }
 
 // Watch episode
-async function watchEpisode(url, episodeNumber, animeId) {
+window.watchEpisode = async function watchEpisode(url, episodeNumber, animeId) {
     console.log(`Watching episode: ${url}`);
     const episodeId = url.split('/').pop(); // Extract episodeId from URL
     await setVideoSource(episodeId, episodeNumber, animeId);
-}
+};
 
 // Set video source and handle playback
 async function setVideoSource(episodeId, episodeNumber, animeId) {
@@ -170,21 +171,19 @@ function formatTime(seconds) {
 }
 
 // Save watch progress
-function saveWatchProgress(animeId, episode, time) {
+window.saveWatchProgress = function saveWatchProgress(animeId, episode, time) {
     const watchProgress = {
         episode,
         time
     };
     localStorage.setItem(`anime_${animeId}_episode_${episode}_progress`, JSON.stringify(watchProgress));
-}
+};
 
 // Get watch progress
-function getWatchProgress(animeId, episode) {
+window.getWatchProgress = function getWatchProgress(animeId, episode) {
     const progress = localStorage.getItem(`anime_${animeId}_episode_${episode}_progress`);
     return progress ? JSON.parse(progress) : null;
-}
-
-
+};
 
 document.addEventListener('DOMContentLoaded', () => {
     const urlParams = new URLSearchParams(window.location.search);
