@@ -12,14 +12,15 @@ async function fetchAnimeInfo(animeId) {
         }
         const data = await response.json();
         console.log('Anime info fetched:', data);
-        displayEpisodes(data.episodes, animeId);
+        displayEpisodes(data.episodes, animeId, data.title, data.image); // Pass title and image
     } catch (error) {
         console.error('Error fetching anime info:', error);
     }
 }
 
+
 // Display episodes
-function displayEpisodes(episodes, animeId) {
+function displayEpisodes(episodes, animeId, title, image) {
     const episodesContainer = document.getElementById('episodes-container');
     if (!episodes || episodes.length === 0) {
         console.error('No episodes found');
@@ -33,7 +34,7 @@ function displayEpisodes(episodes, animeId) {
         const progressTime = progress ? formatTime(progress.time) : 'Not started';
 
         return `
-            <div class="episode-card" onclick="watchEpisode('${ep.url}', ${ep.number}, '${animeId}')">
+            <div class="episode-card" onclick="watchEpisode('${ep.url}', ${ep.number}, '${animeId}', '${title}', '${image}')">
                 <div class="episode-header">
                     Ep ${ep.number}
                     <span class="progress-time">${progressTime}</span>
@@ -44,14 +45,15 @@ function displayEpisodes(episodes, animeId) {
 }
 
 // Watch episode
-window.watchEpisode = async function watchEpisode(url, episodeNumber, animeId) {
+window.watchEpisode = async function watchEpisode(url, episodeNumber, animeId, title, image) {
     console.log(`Watching episode: ${url}`);
     const episodeId = url.split('/').pop(); // Extract episodeId from URL
-    await setVideoSource(episodeId, episodeNumber, animeId);
+    await setVideoSource(episodeId, episodeNumber, animeId, title, image);
 };
 
+
 // Set video source and handle playback
-async function setVideoSource(episodeId, episodeNumber, animeId) {
+async function setVideoSource(episodeId, episodeNumber, animeId, title, image) {
     const player = document.getElementById('videoPlayer');
     console.log(`Fetching video source for episode ID: ${episodeId}`);
 
@@ -67,7 +69,6 @@ async function setVideoSource(episodeId, episodeNumber, animeId) {
             throw new Error('No valid video source found');
         }
 
-        // Find the highest quality source (assuming 1080p is the highest)
         const highestQualitySource = sources.reduce((prev, current) => {
             const prevQuality = parseInt(prev.quality.replace('p', '')) || 0;
             const currentQuality = parseInt(current.quality.replace('p', '')) || 0;
@@ -77,15 +78,14 @@ async function setVideoSource(episodeId, episodeNumber, animeId) {
         console.log(`Setting video source to: ${highestQualitySource.url}`);
         createQualityButtons(sources, episodeNumber, animeId);
 
-        // Load the highest quality source
-        setPlayerSource(highestQualitySource.url, player, episodeId, episodeNumber, animeId);
+        setPlayerSource(highestQualitySource.url, player, episodeId, episodeNumber, animeId, title, image);
     } catch (error) {
         console.error('Error setting video source:', error);
     }
 }
 
 // Set player source and handle playback events
-function setPlayerSource(url, player, episodeId, episodeNumber, animeId) {
+function setPlayerSource(url, player, episodeId, episodeNumber, animeId, title, image) {
     if (Hls.isSupported()) {
         const hls = new Hls();
         hls.loadSource(url);
@@ -127,9 +127,8 @@ function setPlayerSource(url, player, episodeId, episodeNumber, animeId) {
         console.error('Error playing video');
     };
 
-    // Save progress on pause
     player.addEventListener('pause', () => {
-        saveWatchProgress(animeId, episodeNumber, player.currentTime);
+        saveWatchProgress(animeId, episodeNumber, player.currentTime, title, image);
         showPopupMessage(`Progress saved at ${formatTime(player.currentTime)}`);
     });
 }
@@ -173,11 +172,22 @@ function formatTime(seconds) {
 // Save watch progress
 window.saveWatchProgress = function saveWatchProgress(animeId, episode, time) {
     const watchProgress = {
+        animeId,
         episode,
-        time
+        time,
+        watchedAt: new Date().toISOString()
     };
     localStorage.setItem(`anime_${animeId}_episode_${episode}_progress`, JSON.stringify(watchProgress));
-};
+
+    let recentlyWatched = JSON.parse(localStorage.getItem('recentlyWatched')) || [];
+    recentlyWatched = recentlyWatched.filter(item => !(item.animeId === animeId && item.episode === episode));
+    recentlyWatched.unshift(watchProgress);
+    if (recentlyWatched.length > 10) {
+        recentlyWatched.pop();
+    }
+    localStorage.setItem('recentlyWatched', JSON.stringify(recentlyWatched));
+}
+
 
 // Get watch progress
 window.getWatchProgress = function getWatchProgress(animeId, episode) {

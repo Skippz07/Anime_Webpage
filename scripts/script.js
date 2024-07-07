@@ -158,9 +158,6 @@ function displayError(message) {
     display.style.display = 'block'; // Show the error message
 }
 
-function closeSidebar() {
-    document.getElementById('sidebar').style.display = 'none';
-}
 
 window.redirectToAnime = function redirectToAnime(animeId) {
     window.location.href = `Anime.html?id=${animeId}`;
@@ -231,6 +228,53 @@ function loadBookmarks() {
     });
 }
 
+async function displayRecentlyWatched() {
+    const recentlyWatched = JSON.parse(localStorage.getItem('recentlyWatched')) || [];
+    const container = document.getElementById('recently-watched');
+
+    if (recentlyWatched.length === 0) {
+        container.innerHTML = '<p>No recently watched episodes.</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+    for (const item of recentlyWatched) {
+        if (!item || !item.animeId || !item.episode) {
+            console.error('Invalid recently watched item:', item);
+            continue;
+        }
+
+        try {
+            const animeDetails = await fetchRoute(`info/${item.animeId}`);
+            const formattedTime = formatTime(item.time); // Format the timestamp
+            const isBookmarked = checkIfBookmarked(item.animeId); // Check if the item is bookmarked
+
+            const animeCard = `
+                <div class="anime-card" data-anime-id="${item.animeId}" onclick="redirectToAnime('${item.animeId}')">
+                    <img src="${animeDetails.image}" alt="${animeDetails.title}">
+                    <i class="fas fa-bookmark bookmark-icon ${isBookmarked ? 'bookmarked' : ''}" onclick="toggleBookmark(event, '${item.animeId}')"></i>
+                    <div class="episode-info">
+                        <h3>${animeDetails.title}</h3>
+                        <p>Episode ${item.episode} ${formattedTime}</p>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', animeCard);
+        } catch (error) {
+            console.error(`Error fetching anime details for ${item.animeId}:`, error);
+        }
+    }
+}
+function checkIfBookmarked(animeId) {
+    const bookmarks = JSON.parse(localStorage.getItem('bookmarks')) || [];
+    return bookmarks.includes(animeId);
+}
+function formatTime(seconds) {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const sec = Math.floor(seconds % 60);
+    return `${hours}:${minutes < 10 ? '0' : ''}${minutes}:${sec < 10 ? '0' : ''}${sec}`;
+}
 function showPopupMessage(message) {
     const popup = document.getElementById('popup-message');
     popup.textContent = message;
@@ -266,6 +310,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     setTimeout(async () => {
         await fetchGenres();
         resetContent();
+        displayRecentlyWatched();
         document.getElementById('search-input').addEventListener('input', handleSearchInput);
         // Hide the loading screen after content is loaded
         document.getElementById('loading-screen').style.display = 'none';

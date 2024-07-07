@@ -11,12 +11,12 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #637385; /* Navbar background color */
+    background-color: #637385; 
     padding: 10px;
 }
 
 .Logo {
-    max-width: 50px;
+    width: 4vw;
     cursor: pointer;
 }
 
@@ -24,13 +24,15 @@ body {
     flex: 1;
     text-align: center;
     margin: 0;
-    font-size: 1.2em;
-    color: #e2e2e2; /* Navbar text color */
+    font-size: 3em;
+    color: #e2e2e2; 
 }
 
 .navbar .icon {
     margin-left: auto;
-    color: #e2e2e2; /* Navbar icon color */
+    color: #e2e2e2; 
+    font-size: 2em; 
+
 }
 
 .main-container {
@@ -49,29 +51,32 @@ body {
     display: flex;
     justify-content: center;
     margin-bottom: 20px;
+    font-size: 1.2em;
 }
 
 .search-container {
     position: relative;
     display: flex;
     align-items: center;
-    max-width: 250px;
+    max-width: 10vw;
     width: 100%;
+
 }
 
 .search-container input {
     padding: 8px;
-    padding-right: 30px; /* Add padding to the right to make space for the icon */
+    padding-right: 30px; 
     width: 100%;
     border: none;
     border-radius: 5px;
     outline: none;
-    background-color: #637385; /* Search bar background color */
+    background-color: #637385; 
     color: #e2e2e2; 
+    font-size: 1.2em;
 }
 
 .search-container input::placeholder {
-    color: #e2e2e2; /* Placeholder text color */
+    color: #e2e2e2; 
 }
 .search-container .search-icon {
     position: absolute;
