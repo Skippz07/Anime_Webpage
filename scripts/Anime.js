@@ -23,7 +23,13 @@ function displayAnimeInfo(anime) {
     document.getElementById('anime-poster').src = anime.image;
     document.getElementById('anime-title').textContent = anime.title;
     document.getElementById('anime-description').textContent = anime.description || 'No description available';
-    document.getElementById('anime-genres').textContent = anime.genres.join(', ');
+    
+    // Create genre buttons
+    const genresContainer = document.getElementById('anime-genres');
+    genresContainer.innerHTML = anime.genres.map(genre => `
+        <button class="genre-button">${genre}</button>
+    `).join('');
+    
     document.getElementById('anime-releaseDate').textContent = anime.releaseDate || 'Unknown';
     document.getElementById('anime-status').textContent = anime.status;
     document.getElementById('anime-otherName').textContent = anime.otherName || 'N/A';
