@@ -16,7 +16,7 @@ body {
 }
 
 .Logo {
-    width: 4vw;
+    width: 120px;
     cursor: pointer;
 }
 
@@ -58,30 +58,24 @@ body {
     position: relative;
     display: flex;
     align-items: center;
-    max-width: 10vw;
+    max-width: 350px;
     width: 100%;
-
 }
 
 .search-container input {
     padding: 8px;
-    padding-right: 30px; 
+    padding-right: 20px; 
     width: 100%;
     border: none;
     border-radius: 5px;
     outline: none;
-    background-color: #637385; 
-    color: #e2e2e2; 
+    background-color: #637385;
+    color: #e2e2e2;
     font-size: 1.2em;
 }
 
 .search-container input::placeholder {
-    color: #e2e2e2; 
-}
-.search-container .search-icon {
-    position: absolute;
-    right: 10px; 
-    color: #e2e2e2; /* Icon color */
+    color: #e2e2e2;
 }
 
 .section {
