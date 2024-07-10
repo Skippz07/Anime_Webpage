@@ -264,6 +264,16 @@ button#watch-now-btn:hover {
         font-size: 0.8em;
     }
 
+    .genre-button {
+        padding: 5px 10px;
+        margin: 5px;
+        background-color: #555;
+        border: none;
+        border-radius: 5px;
+        color: #fff;
+        cursor: pointer;
+        font-size: 1.3em;
+    }
     .episodes-list h2 {
         font-size: 1.2em;
     }
