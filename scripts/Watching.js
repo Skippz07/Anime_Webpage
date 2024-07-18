@@ -2,8 +2,8 @@ import CONFIG from './config.js';
 
 const apiBaseURL = CONFIG.API_BASE_URL;
 let hlsInstance = null;
-let qualityOptions = []; // Define qualityOptions globally to avoid scope issues
-let currentVideoUrl = ''; // Track the current video URL for download
+let qualityOptions = []; 
+let currentVideoUrl = ''; 
 
 // Fetch anime info and display episodes
 async function fetchAnimeInfo(animeId) {
@@ -16,6 +16,17 @@ async function fetchAnimeInfo(animeId) {
         const data = await response.json();
         console.log('Anime info fetched:', data);
         displayEpisodes(data.episodes, animeId, data.title, data.image); // Pass title and image
+
+        // Automatically play the first episode if the episodeUrl is not provided in the URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const episodeUrl = urlParams.get('episodeUrl');
+        if (!episodeUrl && data.episodes.length > 0) {
+            watchEpisode(data.episodes[0].url, 1, animeId, data.title, data.image);
+        } else if (episodeUrl) {
+            // If episodeUrl is provided, play that episode
+            const episodeNumber = data.episodes.findIndex(ep => ep.url === episodeUrl) + 1;
+            watchEpisode(episodeUrl, episodeNumber, animeId, data.title, data.image);
+        }
     } catch (error) {
         console.error('Error fetching anime info:', error);
     }
@@ -36,7 +47,7 @@ function displayEpisodes(episodes, animeId, title, image) {
         const progressTime = progress ? formatTime(progress.time) : 'Not started';
 
         return `
-            <div class="episode-card" onclick="watchEpisode('${ep.url}', ${ep.number}, '${animeId}', '${title}', '${image}')">
+            <div class="episode-card" data-episode-number="${ep.number}" data-episode-url="${ep.url}" onclick="watchEpisode('${ep.url}', ${ep.number}, '${animeId}', '${title}', '${image}')">
                 <div class="episode-header">
                     Ep ${ep.number}
                     <span class="progress-time">${progressTime}</span>
@@ -50,6 +61,11 @@ function displayEpisodes(episodes, animeId, title, image) {
 window.watchEpisode = async function watchEpisode(url, episodeNumber, animeId, title, image) {
     console.log(`Watching episode: ${url}`);
     const episodeId = url.split('/').pop(); // Extract episodeId from URL
+    const player = document.getElementById('videoPlayer');
+    player.setAttribute('data-anime-id', animeId);
+    player.setAttribute('data-episode-number', episodeNumber);
+    player.setAttribute('data-title', title);
+    player.setAttribute('data-image', image);
     await setVideoSource(episodeId, episodeNumber, animeId, title, image);
 };
 
@@ -79,7 +95,12 @@ async function setVideoSource(episodeId, episodeNumber, animeId, title, image) {
         }, sources[0]);
 
         console.log(`Setting video source to: ${highestQualitySource.url}`);
-        currentVideoUrl = highestQualitySource.url; // Set the initial video URL for download
+        currentVideoUrl = highestQualitySource.url; 
+
+        // Remove existing tracks
+        while (player.firstChild) {
+            player.removeChild(player.firstChild);
+        }
 
         // Add captions if available before initializing Plyr
         captions.forEach(caption => {
@@ -116,7 +137,7 @@ function initializePlayerWithQualityOptions(player, sources) {
 
     const playerInstance = new Plyr(player, {
         controls,
-        settings: ['quality', 'speed', 'captions'], // Include quality, speed, and captions in settings
+        settings: ['quality', 'speed', 'captions'],
         quality: {
             default: qualityOptions[0].value,
             options: qualityOptions.map(option => option.value),
@@ -134,7 +155,46 @@ function initializePlayerWithQualityOptions(player, sources) {
         }
     });
 
+    playerInstance.on('ready', () => {
+        const controlsContainer = playerInstance.elements.controls;
+        if (controlsContainer) {
+            // Add custom next episode button to Plyr controls
+            const nextButton = document.createElement('button');
+            nextButton.className = 'plyr__controls__item plyr__control';
+            nextButton.type = 'button';
+            nextButton.innerHTML = 'Next Episode';
+            nextButton.title = 'Next Episode';
+            nextButton.setAttribute('aria-label', 'Next Episode');
+            nextButton.style.cssText = `
+                background: none;
+                border: none;
+                cursor: pointer;
+                padding: 0;
+                margin: 0 5px;
+            `;
+            nextButton.addEventListener('click', handleNextEpisode);
+
+            controlsContainer.appendChild(nextButton);
+        }
+    });
+
     player.plyr = playerInstance;
+
+    playerInstance.on('ended', updateNextButtonVisibility);
+    playerInstance.on('play', updateNextButtonVisibility);
+}
+
+// Update the visibility of the next episode button
+function updateNextButtonVisibility() {
+    const player = document.getElementById('videoPlayer');
+    const animeId = player.getAttribute('data-anime-id');
+    const currentEpisodeNumber = parseInt(player.getAttribute('data-episode-number'));
+    const nextEpisode = document.querySelector(`.episode-card[data-episode-number="${currentEpisodeNumber + 1}"]`);
+    const nextButton = document.querySelector('.plyr__control[aria-label="Next Episode"]');
+
+    if (nextButton) {
+        nextButton.style.display = nextEpisode ? 'inline-block' : 'none';
+    }
 }
 
 // Set player source and handle playback
@@ -184,6 +244,27 @@ function setPlayerSource(url, player, episodeId, episodeNumber, animeId, title, 
         saveWatchProgress(animeId, episodeNumber, player.currentTime, title, image);
         showPopupMessage(`Progress saved at ${formatTime(player.currentTime)}`);
     });
+
+    player.addEventListener('ended', updateNextButtonVisibility);
+}
+
+// Handle the next episode button click
+function handleNextEpisode() {
+    const player = document.getElementById('videoPlayer');
+    const animeId = player.getAttribute('data-anime-id');
+    const currentEpisodeNumber = parseInt(player.getAttribute('data-episode-number'));
+    const nextEpisodeNumber = currentEpisodeNumber + 1;
+    const title = player.getAttribute('data-title');
+    const image = player.getAttribute('data-image');
+
+    const nextEpisode = document.querySelector(`.episode-card[data-episode-number="${nextEpisodeNumber}"]`);
+
+    if (nextEpisode) {
+        const nextEpisodeUrl = nextEpisode.getAttribute('data-episode-url');
+        watchEpisode(nextEpisodeUrl, nextEpisodeNumber, animeId, title, image);
+    } else {
+        showPopupMessage('No more episodes to play.');
+    }
 }
 
 // Update quality
@@ -193,7 +274,7 @@ function updateQuality(newQuality, qualityOptions) {
     if (selectedOption && hlsInstance) {
         hlsInstance.loadSource(selectedOption.src);
         hlsInstance.attachMedia(document.getElementById('videoPlayer'));
-        currentVideoUrl = selectedOption.src; // Update current video URL for download
+        currentVideoUrl = selectedOption.src; 
         console.log('Updated video URL for download:', currentVideoUrl);
     }
 }
@@ -255,15 +336,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     console.log(`Page loaded with episodeUrl: ${episodeUrl} and animeId: ${animeId}`);
 
-    if (episodeUrl && animeId) {
-        const episodeId = episodeUrl.split('/').pop();
-        const episodeNumber = 1; // Default to 1, should be replaced with actual episode number
-        setVideoSource(episodeId, episodeNumber, animeId);
-    }
-
     if (animeId) {
         fetchAnimeInfo(animeId);
     } else {
         console.error('No anime ID provided');
     }
+
+    // Ensure next episode button is always created and updated
+    const player = document.getElementById('videoPlayer');
+    player.addEventListener('loadeddata', () => {
+        updateNextButtonVisibility();
+    });
 });

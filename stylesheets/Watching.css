@@ -157,6 +157,21 @@ body {
     display: block;
 }
 
+.plyr__controls__item--next {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0;
+    margin: 0 5px;
+}
+
+.plyr__controls__item--next svg {
+    width: 20px;
+    height: 20px;
+    fill: currentColor;
+}
+
+
 @media (max-width: 600px) {
     #episodes-container {
         grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
